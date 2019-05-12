@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 #from tensorflow import Conv2D
 # import numpy.plot as plt
-
+import csv
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -87,5 +87,15 @@ model.compile(optimizer='Adam',
              metrics=['accuracy'])
 			 
 
-model.fit(x_train, y_train, epochs=25, validation_data = (x_test, y_test))
+result = model.fit(x_train, y_train, epochs=3, validation_data = (x_test, y_test))
 model.evaluate(x_test, y_test)
+
+f= open("guru100.csv","wb")
+loss = result.history["loss"]
+acc = result.history["acc"]
+val_loss = result.history["val_loss"]
+val_acc = result.history["val_acc"]
+w = csv.writer(f)
+w.writerow(result.history.keys())
+w.writerow(result.history.values())
+f.close()
