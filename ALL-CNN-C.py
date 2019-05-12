@@ -12,6 +12,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 x_train = x_train.astype('float32')/255
 x_test = x_test.astype('float32')/255
 
+
 #print(len(y_train[0]))
 
 
@@ -87,15 +88,20 @@ model.compile(optimizer='Adam',
              metrics=['accuracy'])
 			 
 
-result = model.fit(x_train, y_train, epochs=3, validation_data = (x_test, y_test))
+result = model.fit(x_train, y_train, epochs=120 , validation_data = (x_test, y_test)) 
 model.evaluate(x_test, y_test)
 
-f= open("guru100.csv","wb")
+
+
+# prints the result to csv file
+f= open("guru100.csv","w")
 loss = result.history["loss"]
 acc = result.history["acc"]
 val_loss = result.history["val_loss"]
 val_acc = result.history["val_acc"]
-w = csv.writer(f)
-w.writerow(result.history.keys())
-w.writerow(result.history.values())
+f.write("iteration , Loss , acc , valLoss , valAcc\n")
+for i in range(len(loss)):
+	row = str(i) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
+	f.write(row)
+
 f.close()
