@@ -201,7 +201,7 @@ def setUpModel():
 
 def trainModel():
     # callback used for cyclical learning
-    clr = CyclicLR(base_lr=0.0001, max_lr=0.006, step_size=2000., mode='triangular2')
+    clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular2')
     
     # callback used to save the model during runtime
     checkpoint_path = "training_1/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
