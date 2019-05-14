@@ -144,6 +144,8 @@ class CyclicLR(tf.keras.callbacks.Callback):
 # ------------------------------------- end of code from https://github.com/bckenstler/CLR
 
 
+
+
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 #print("getShape of x_train")
 #print(tf.Tensor.get_shape(x_train))
@@ -193,12 +195,12 @@ class CyclicLR(tf.keras.callbacks.Callback):
 #print("converted to numpy")
 #print(tf.Tensor.get_shape(x_train))
 #print(tf.Tensor.get_shape(x_test))
-x_train = x_train.astype('float32')/255  # .astype('float32')
-x_test = x_test.astype('float32')/255
-# mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
-# std = np.std(x_train,axis=(0,1,2,3))
-# x_train = (x_train-mean)/(std+1e-7)
-# x_test = (x_test-mean)/(std+1e-7) 
+#x_train = x_train.astype('float32')/255  # .astype('float32')
+#x_test = x_test.astype('float32')/255
+mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
+std = np.std(x_train,axis=(0,1,2,3))
+x_train = (x_train-mean)/(std+1e-7)
+x_test = (x_test-mean)/(std+1e-7) 
 #"""
 #aaa  
 
@@ -235,6 +237,8 @@ model.add(tf.keras.layers.Conv2D(filters =10, kernel_size =1, padding = "same", 
 model.add(tf.keras.layers.BatchNormalization())
 
 
+
+model.add(tf.keras.layers.GlobalAveragePooling2D())
 model.add(tf.keras.layers.Flatten())
 model.add(tf.keras.layers.Dense(10,activation ='softmax'))
 
@@ -248,11 +252,11 @@ model.compile(optimizer='Adam',
 
 
 
-clr = CyclicLR(base_lr=0.001, max_lr=0.1, step_size=2000., mode='triangular2')
+clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular2')
 #result = model.fit(x_train, y_train, epochs=25 , validation_data = (x_test, y_test), callbacks = [clr]) 
 
 result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32),
-                    steps_per_epoch=len(x_train) / 32, epochs=25, validation_data = (x_test,y_test), callbacks = [clr])
+                    steps_per_epoch=len(x_train) / 32, epochs=350, validation_data = (x_test,y_test), callbacks = [clr])
 
 #model.evaluate(x_test, y_test) ##this one can be commented out to reduce read time. 
 
