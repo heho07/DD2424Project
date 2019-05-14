@@ -145,15 +145,50 @@ class CyclicLR(tf.keras.callbacks.Callback):
 
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+print("getShape of x_train")
+print(tf.Tensor.get_shape(x_train))
+print("starting to merge ytrain")
 
-# x_train = x_train.astype('float32')/255
-# x_test = x_test.astype('float32')/255
+x_train = x_test
+y_train = y_test
 
+print(tf.Tensor.get_shape(y_train))
+y_train = np.concatenate((y_train, y_train), axis = 0)
+print(tf.Tensor.get_shape(y_train))
+print("ytrain merged")
+
+x_trainChanged = []
+print("starting to create changed array")
+for index, image in enumerate(x_train):
+	tensor = (tf.image.random_flip_left_right(image))
+	tensor = tf.image.random_brightness(tensor, 0.5)
+	x_trainChanged.append(tensor)
+	# x_train = tf.concat([x_train, tensor], 0)
+x_trainChanged = np.array(x_trainChanged)
+print("x_train_changed shape:")
+print(tf.Tensor.get_shape(x_trainChanged))
+
+print("xtrain shape:")
+print(tf.Tensor.get_shape(x_train))
+
+x_train = np.concatenate((x_train, x_trainChanged), axis = 0)
+print("changed array created\n starting to merge the two arrays")
+# x_train = [x_train, x_trainChanged]
+print("merged arrays")
+# sess = tf.Session()
+# with sess.as_default():
+# 	x_train = x_train.eval() 
+# 	y_train = y_train.eval()
 #z-score
-mean = np.mean(x_train,axis=(0,1,2,3))
-std = np.std(x_train,axis=(0,1,2,3))
-x_train = (x_train-mean)/(std+1e-7)
-x_test = (x_test-mean)/(std+1e-7)
+print("converted to numpy")
+print(tf.Tensor.get_shape(x_train))
+print(tf.Tensor.get_shape(x_test))
+x_train = x_train.astype('float32')/255  # .astype('float32')
+x_test = x_test.astype('float32')/255
+# mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
+# std = np.std(x_train,axis=(0,1,2,3))
+# x_train = (x_train-mean)/(std+1e-7)
+# x_test = (x_test-mean)/(std+1e-7)
 
 
 model = tf.keras.Sequential()
@@ -192,7 +227,7 @@ model.compile(optimizer='Adam',
 
 # callback codes below
 batch_print_callback = tf.keras.callbacks.LambdaCallback(
-    on_epoch_begin = lambda batch,logs: print(model.optimizer.lr)
+    on_epoch_begin = lambda batch,logs: tf.print(model.optimizer.lr)
 		# 	
 	) #				model.set_value(self.mode.optimizer.lr, value)))
 
@@ -213,8 +248,8 @@ batch_learning_callback = tf.keras.callbacks.LearningRateScheduler(
 		# model.optimizer.lr.set_value(0.001)	
 	) #				model.set_value(self.mode.optimizer.lr, value)))
 
-clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular2')
-result = model.fit(x_train, y_train, epochs=5 , validation_data = (x_test, y_test), callbacks = [clr, batch_print_callback]) 
+clr = CyclicLR(base_lr=0.001, max_lr=0.1, step_size=2000., mode='triangular2')
+result = model.fit(x_train, y_train, epochs=25 , validation_data = (x_test, y_test), callbacks = [clr]) 
 model.evaluate(x_test, y_test)
 
 # weights = model.get_weights()
@@ -229,7 +264,7 @@ val_loss = result.history["val_loss"]
 val_acc = result.history["val_acc"]
 f.write("iteration , Loss , acc , valLoss , valAcc\n")
 for i in range(len(loss)):
-	row = str(i) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
+	row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
 	f.write(row)
 
 f.close()
