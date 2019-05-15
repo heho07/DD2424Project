@@ -250,14 +250,16 @@ model = setUpModel()
 # plt.figure()
 
 frog2 = np.asarray(frog)
-# print(cat)
+print(frog2.shape)
 # with a Sequential model
 cat_batch = np.expand_dims(frog2,axis=0)
 get_3rd_layer_output = K.function([model.layers[0].input],
                                   [model.layers[2].output])
 layer_output = get_3rd_layer_output([cat_batch])[0]
-flattened_layer_output = np.mean(layer_output, axis = 3)
-print(layer_output.shape)
+layer_output = np.squeeze(layer_output, axis = 0)
+print("layer output shape: " + str(layer_output.shape))
+flattened_layer_output = np.mean(layer_output, axis = 2)
+# flattened_layer_output = layer_output.reshape((32, 32, 3))
 print(flattened_layer_output.shape)
 plt.figure()
 plt.imshow(flattened_layer_output)
