@@ -1,0 +1,2 @@
+model_checkpoint_path: "frog-0005.ckpt"
+all_model_checkpoint_paths: "frog-0005.ckpt"

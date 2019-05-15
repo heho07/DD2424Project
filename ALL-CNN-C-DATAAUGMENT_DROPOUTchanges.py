@@ -161,7 +161,7 @@ datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start o
     width_shift_range=0.2,
     height_shift_range=0.2,
     horizontal_flip=True)
-	
+    
 def setUpModel():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Dropout(0.2, input_shape=x_train.shape[1:]))
@@ -198,7 +198,7 @@ def setUpModel():
     model.compile(optimizer='Adam',
                  loss='sparse_categorical_crossentropy',
                  metrics=['accuracy'])
-    return model			 
+    return model             
 
 
 def trainModel():
@@ -224,8 +224,8 @@ def trainModel():
     val_acc = result.history["val_acc"]
     f.write("iteration , Loss , acc , valLoss , valAcc\n")
     for i in range(len(loss)):
-    	row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
-    	f.write(row)
+        row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
+        f.write(row)
 
     f.close()
 

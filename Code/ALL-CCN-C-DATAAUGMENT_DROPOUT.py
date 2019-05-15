@@ -139,6 +139,9 @@ class CyclicLR(tf.keras.callbacks.Callback):
             self.history.setdefault(k, []).append(v)
         
         K.set_value(self.model.optimizer.lr, self.clr())
+    def on_epoch_end(self, epoch, logs=None):
+        print(self.clr())
+        print(self.base_lr)
 
 # ------------------------------------- end of code from https://github.com/bckenstler/CLR
 
@@ -200,8 +203,9 @@ def setUpModel():
 
 
 def trainModel():
+    # one update step is 1 batch - 1 cycle is step_size * 2 no. of update steps
     # callback used for cyclical learning
-    clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular2')
+    clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000, mode='triangular2')
     
     # callback used to save the model during runtime
     checkpoint_path = "../WeightsFromTraining/foo.ckpt"
@@ -232,10 +236,10 @@ def trainModel():
 loading_checkpoint_path = "../WeightsFromTraining/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
 
 model = setUpModel()
+# model.evaluate(x_test, y_test)
+# model.load_weights(loading_checkpoint_path)
 model.evaluate(x_test, y_test)
-model.load_weights(loading_checkpoint_path)
-model.evaluate(x_test, y_test)
-# result = trainModel()
+result = trainModel()
 
 
 
