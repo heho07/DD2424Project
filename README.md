@@ -1,5 +1,11 @@
 # DD2424 Deep Learning Project
 
+###Folder structure
+Code folder saves all the code
+ResultsFromtraining folder saves .csv documents with training & validationa accuracy during the training run
+WeightsFromTraining folder saves the weights
+
+
 ## Up and running
 
 [Tensorflow](https://www.tensorflow.org/) is required to run this project.
