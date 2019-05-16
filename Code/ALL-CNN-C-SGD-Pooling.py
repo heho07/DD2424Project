@@ -39,6 +39,7 @@ def setUpModel():
 
     # "max-pooling ish" with dropout 0.5 after
     model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2), kernel_regularizer=tf.keras.regularizers.l2(l=l2_reg)))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
     model.add(tf.keras.layers.Dropout(0.5))
 
     # Two 3 x 3 conv.96 ReLU
@@ -46,7 +47,7 @@ def setUpModel():
     model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(l=l2_reg)))
 
     # "max-pooling" with dropout 0.5 after
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2), kernel_regularizer=tf.keras.regularizers.l2(l=l2_reg)))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
     model.add(tf.keras.layers.Dropout(0.5))
 
     # One 3 x 3 conv. 192 ReLU
@@ -89,7 +90,7 @@ def trainModel(model):
             height_shift_range=0.2,
             horizontal_flip=True)
 
-    result = model.fit(x_train, y_train, epochs=350 , validation_data = (x_test, y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback]) 
+    result = model.fit(x_train, y_train, epochs=350 , validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
 
 
     # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
