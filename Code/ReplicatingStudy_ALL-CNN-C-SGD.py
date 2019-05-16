@@ -14,13 +14,13 @@ x_test = x_test.astype('float32')/255
 
 # checks all the possible epoch states we want to catch
 def lr_schedule(epoch):
-    lrate = 0.001
+    lrate = 0.01
     if epoch > 200:
-        lrate = 0.0001
+        lrate = 0.001
     if epoch > 250:
-        lrate = 0.00001
+        lrate = 0.0001
     if epoch > 300:
-        lrate = 0.000001        
+        lrate = 0.00001        
     return lrate
 
 def setUpModel():
@@ -66,7 +66,7 @@ def setUpModel():
 
     # SGD optimizer
     # learning rate, one of  [0.25, 0.1, 0.05, 0.01], which one is the best?
-    sgd = tf.keras.optimizers.SGD(lr=0.001, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
+    sgd = tf.keras.optimizers.SGD(lr=0.01, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
 
     model.compile(optimizer=sgd,
                   loss='sparse_categorical_crossentropy',
