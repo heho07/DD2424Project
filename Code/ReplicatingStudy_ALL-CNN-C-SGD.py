@@ -90,15 +90,8 @@ def trainModel(model, iteration_learning_rate, number_of_epochs):
     #         height_shift_range=0.2,
     #         horizontal_flip=True)
 
-<<<<<<< HEAD
     result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
-=======
-<<<<<<< HEAD:Code/ALL-CNN-C-SGD-Pooling.py
-    result = model.fit(x_train, y_train, epochs=350 , validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
-=======
-    result = model.fit(x_train, y_train, epochs=350, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
->>>>>>> ea9ea0075d11f1d22c7ea6415681b24288c2c0d0:Code/ReplicatingStudy_ALL-CNN-C-SGD.py
->>>>>>> df39d5ab359ba1803a0c65c78d12f9267638cc60
+
 
 
     # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
