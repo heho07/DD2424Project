@@ -14,13 +14,13 @@ x_test = x_test.astype('float32')/255
 
 # checks all the possible epoch states we want to catch
 def lr_schedule(epoch):
-    lrate = 0.001
+    lrate = 0.01
     if epoch > 200:
-        lrate = 0.0001
+        lrate = 0.001
     if epoch > 250:
-        lrate = 0.00001
+        lrate = 0.0001
     if epoch > 300:
-        lrate = 0.000001        
+        lrate = 0.00001        
     return lrate
 
 def setUpModel():
@@ -67,7 +67,7 @@ def setUpModel():
 
     # SGD optimizer
     # learning rate, one of  [0.25, 0.1, 0.05, 0.01], which one is the best?
-    sgd = tf.keras.optimizers.SGD(lr=0.001, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
+    sgd = tf.keras.optimizers.SGD(lr=0.01, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
 
     model.compile(optimizer=sgd,
                   loss='sparse_categorical_crossentropy',
@@ -82,15 +82,19 @@ def trainModel(model):
                                                      save_weights_only=True,
                                                      verbose=1)
 
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
-            featurewise_center=False,
-            featurewise_std_normalization=False,
-            rotation_range=20,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            horizontal_flip=True)
+    # datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
+    #         featurewise_center=False,
+    #         featurewise_std_normalization=False,
+    #         rotation_range=20,
+    #         width_shift_range=0.2,
+    #         height_shift_range=0.2,
+    #         horizontal_flip=True)
 
+<<<<<<< HEAD:Code/ALL-CNN-C-SGD-Pooling.py
     result = model.fit(x_train, y_train, epochs=350 , validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
+=======
+    result = model.fit(x_train, y_train, epochs=350, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
+>>>>>>> ea9ea0075d11f1d22c7ea6415681b24288c2c0d0:Code/ReplicatingStudy_ALL-CNN-C-SGD.py
 
 
     # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
