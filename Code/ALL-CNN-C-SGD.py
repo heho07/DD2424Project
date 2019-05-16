@@ -81,15 +81,15 @@ def trainModel(model):
                                                      save_weights_only=True,
                                                      verbose=1)
 
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
-            featurewise_center=False,
-            featurewise_std_normalization=False,
-            rotation_range=20,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            horizontal_flip=True)
+    # datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
+    #         featurewise_center=False,
+    #         featurewise_std_normalization=False,
+    #         rotation_range=20,
+    #         width_shift_range=0.2,
+    #         height_shift_range=0.2,
+    #         horizontal_flip=True)
 
-    result = model.fit(x_train, y_train, epochs=350 , validation_data = (x_test, y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback]) 
+    result = model.fit(x_train, y_train, epochs=350, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
 
 
     # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
