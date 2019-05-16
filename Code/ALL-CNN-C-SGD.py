@@ -12,6 +12,17 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 x_train = x_train.astype('float32')/255  # .astype('float32')
 x_test = x_test.astype('float32')/255
 
+# checks all the possible epoch states we want to catch
+def lr_schedule(epoch):
+    lrate = 0.001
+    if epoch > 200:
+        lrate = 0.0001
+    if epoch > 250:
+        lrate = 0.00001
+    if epoch > 300:
+        lrate = 0.000001        
+    return lrate
+
 def setUpModel():
 
     model = tf.keras.Sequential()
@@ -65,7 +76,7 @@ def setUpModel():
 
 def trainModel(model):
     # callback used to save the model during runtime
-    checkpoint_path = "../WeightsFromTraining/foo.ckpt"
+    checkpoint_path = "../WeightsFromTraining/replicatingStudy/replicatingStudy.ckpt"
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
@@ -78,8 +89,11 @@ def trainModel(model):
             height_shift_range=0.2,
             horizontal_flip=True)
 
-    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
-                epochs=20, validation_data = (x_test,y_test), callbacks = [cp_callback])
+    result = model.fit(x_train, y_train, epochs=350 , validation_data = (x_test, y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback]) 
+
+
+    # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
+    #             epochs=350, validation_data = (x_test,y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback])
 
      # prints the result to csv file
     f= open("../X.csv","w")
@@ -101,6 +115,8 @@ def trainModel(model):
 
 model = setUpModel()
 trainModel(model)
+
+model.save("../Models/replicatingStudy.h5")
 model.evaluate(x_test, y_test)
 # model.load_weights(loading_checkpoint_path)
 # model.evaluate(x_test, y_test)
