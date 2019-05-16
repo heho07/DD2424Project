@@ -164,34 +164,33 @@ datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start o
 	
 def setUpModel():
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Dropout(0.2, input_shape=x_train.shape[1:]))
-    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', input_shape=x_train.shape[1:]))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu'))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001), strides =(2,2)))
+    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2)))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dropout(0.2))
 
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu'))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu'))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2),kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2)))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dropout(0.2))
 
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu'))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =1, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =1, padding = "same", activation = 'relu'))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =10, kernel_size =1, padding = "same", activation = 'relu',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Conv2D(filters =10, kernel_size =1, padding = "same", activation = 'relu'))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dropout(0.2))
 
     model.add(tf.keras.layers.GlobalAveragePooling2D())
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(10,activation ='softmax',kernel_regularizer=tf.keras.regularizers.l2(0.001)))
+    model.add(tf.keras.layers.Dense(10,activation ='softmax'))
 
     model.summary()
 
@@ -214,7 +213,7 @@ def trainModel():
 
     # runs the training procedure
     result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32),
-                epochs=100, validation_data = (x_test,y_test), callbacks = [clr])
+                epochs=350, validation_data = (x_test,y_test), callbacks = [clr])
 
     # prints the result to csv file
     f= open("X.csv","w")
