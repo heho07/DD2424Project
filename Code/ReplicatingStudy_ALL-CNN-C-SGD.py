@@ -23,7 +23,7 @@ def lr_schedule(epoch):
         lrate = 0.00001        
     return lrate
 
-def setUpModel():
+def setUpModel(iteration_learning_rate):
 
     model = tf.keras.Sequential()
 
@@ -66,7 +66,7 @@ def setUpModel():
 
     # SGD optimizer
     # learning rate, one of  [0.25, 0.1, 0.05, 0.01], which one is the best?
-    sgd = tf.keras.optimizers.SGD(lr=0.01, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
+    sgd = tf.keras.optimizers.SGD(lr=iteration_learning_rate, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
 
     model.compile(optimizer=sgd,
                   loss='sparse_categorical_crossentropy',
@@ -74,9 +74,9 @@ def setUpModel():
 
     return model
 
-def trainModel(model):
+def trainModel(model, iteration_learning_rate, number_of_epochs):
     # callback used to save the model during runtime
-    checkpoint_path = "../WeightsFromTraining/replicatingStudy/replicatingStudy.ckpt"
+    checkpoint_path = "../WeightsFromTraining/replicatingStudy/learning_rate" + str(iteration_learning_rate) + ".ckpt"
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
@@ -89,14 +89,14 @@ def trainModel(model):
     #         height_shift_range=0.2,
     #         horizontal_flip=True)
 
-    result = model.fit(x_train, y_train, epochs=350, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
+    result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
 
 
     # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
     #             epochs=350, validation_data = (x_test,y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback])
 
      # prints the result to csv file
-    f= open("../X.csv","w")
+    f= open("../ResultsFromTraining/replicating_study/learning_rate" + str(iteration_learning_rate) + ".csv","w")
     loss = result.history["loss"]
     acc = result.history["acc"]
     val_loss = result.history["val_loss"]
@@ -110,14 +110,23 @@ def trainModel(model):
 
     return result
 
+def initializeTraining(iteration_learning_rate):
+    print("starting with learning rate " + str(iteration_learning_rate))
+    model = setUpModel(iteration_learning_rate)
+    epochs = 350
+    trainModel(model, iteration_learning_rate, epochs)
+
+    model.save("../Models/replicating_study/learning_rate" + str(iteration_learning_rate) + ".h5")
+    model.evaluate(x_test, y_test)
+
+learning_rates = [0.25, 0.1, 0.05]
+
+for current_iteration_learning_rate in learning_rates:
+    initializeTraining(current_iteration_learning_rate)
+
 
 # loading_checkpoint_path = "../WeightsFromTraining/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
 
-model = setUpModel()
-trainModel(model)
-
-model.save("../Models/replicatingStudy.h5")
-model.evaluate(x_test, y_test)
 # model.load_weights(loading_checkpoint_path)
 # model.evaluate(x_test, y_test)
 # result = trainModel()
