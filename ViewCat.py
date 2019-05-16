@@ -155,7 +155,7 @@ std = np.std(x_train,axis=(0,1,2,3))
 x_train = (x_train-mean)/(std+1e-7)
 x_test = (x_test-mean)/(std+1e-7) 
 
-frog = x_train[0,:]
+frog = x_train[1,:]
 
 datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
     featurewise_center=False,
@@ -209,7 +209,7 @@ def trainModel():
     clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular2')
     
     # callback used to save the model during runtime
-    checkpoint_path = "WeightsFromTraining/manyEpochs/all-cnn-c-dataaugment-dropoutchanges-350epochs-{epoch:04d}.ckpt"
+    checkpoint_path = "WeightsFromTraining/pictures/frog-{epoch:04d}.ckpt"
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
                                                 save_weights_only=True,
                                                  verbose=1,
@@ -218,7 +218,7 @@ def trainModel():
 
     # runs the training procedure
     result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32),
-                epochs=350, validation_data = (x_test,y_test), callbacks = [clr, cp_callback])
+                epochs=5, validation_data = (x_test,y_test), callbacks = [clr, cp_callback])
 
     # prints the result to csv file
     f= open("X.csv","w")
@@ -235,14 +235,14 @@ def trainModel():
 
     return result
 
-# loading_checkpoint_path = "WeightsFromTraining/manyEpochs/all-cnn-c-dataaugment-dropoutchanges-350epochs-0010.ckpt"
+# loading_checkpoint_path = "WeightsFromTraining/pictures/frog-0010.ckpt"
 
 model = setUpModel()
 
 # model.evaluate(x_test, y_test)
 # model.load_weights(loading_checkpoint_path)
 # model.evaluate(x_test, y_test)
-# result = trainModel()
+result = trainModel()
 
 
 # cat = imread("cat.png")
@@ -257,22 +257,16 @@ get_3rd_layer_output = K.function([model.layers[0].input],
                                   [model.layers[2].output])
 layer_output = get_3rd_layer_output([cat_batch])[0]
 layer_output = np.squeeze(layer_output, axis = 0)
-print("layer output shape: " + str(layer_output.shape))
-flattened_layer_output = np.mean(layer_output, axis = 2)
-# flattened_layer_output = layer_output.reshape((32, 32, 3))
-print(flattened_layer_output.shape)
-plt.figure()
-plt.imshow(flattened_layer_output)
+
+height, width, depth = layer_output.shape
+nb_plot = int(np.rint(np.sqrt(depth)))
+fig = plt.figure(figsize=(20, 20))
+for i in range(depth):
+    plt.subplot(nb_plot, nb_plot, i+1)
+    plt.imshow(layer_output[:,:,i], cmap='gray')
+    plt.title('feature map {}'.format(i+1))
 plt.show()
-print(frog.shape)
-# print(cat_batch.shape())
-conv_cat = model.predict(cat_batch)
-# conv_cat = np.squeeze(conv_cat, axis=0)
-# conv_cat2 = np.asarray(conv_cat)
-print (conv_cat.shape)
-# plt.figure()
-# plt.imshow(conv_cat)
-# plt.show()
+
 
 
 # model.evaluate(x_test, y_test) ##this one can be commented out to reduce read time. 

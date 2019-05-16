@@ -8,7 +8,7 @@ import csv
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
+learning_rate_history = []
 # from https://github.com/bckenstler/CLR
 class CyclicLR(tf.keras.callbacks.Callback):
     """This callback implements a cyclical learning rate policy (CLR).
@@ -139,19 +139,30 @@ class CyclicLR(tf.keras.callbacks.Callback):
             self.history.setdefault(k, []).append(v)
         
         K.set_value(self.model.optimizer.lr, self.clr())
+        
+    # on each epoch end we save the current learning rate
+    # this way we can later review which order of magnitude the learning rate had
+    def on_epoch_end(self, epoch, logs=None):
+        learning_rate_history.append(self.clr())
+    
 
+    # def on_epoch_end(self, epoch, logs=None):
+    #     print("current lr" + str(self.clr()))
+    #     print("base lr" + str(self.base_lr))
+    
 # ------------------------------------- end of code from https://github.com/bckenstler/CLR
 
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 
-# x_train = x_train.astype('float32')/255  # .astype('float32')
-# x_test = x_test.astype('float32')/255
+# trying to use this one now
+x_train = x_train.astype('float32')/255  # .astype('float32')
+x_test = x_test.astype('float32')/255
 
-mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
-std = np.std(x_train,axis=(0,1,2,3))
-x_train = (x_train-mean)/(std+1e-7)
-x_test = (x_test-mean)/(std+1e-7) 
+# mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
+# std = np.std(x_train,axis=(0,1,2,3))
+# x_train = (x_train-mean)/(std+1e-7)
+# x_test = (x_test-mean)/(std+1e-7) 
 
 
 datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
@@ -161,30 +172,32 @@ datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start o
     width_shift_range=0.2,
     height_shift_range=0.2,
     horizontal_flip=True)
-	
+
+# using low L2 regularizer of 0.00001, 0.001 last time proved too high.
+
 def setUpModel():
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', input_shape=x_train.shape[1:]))
+    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', input_shape=x_train.shape[1:], kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu'))
+    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2)))
-    model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Dropout(0.2))
-
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu'))
-    model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu'))
-    model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2)))
+    model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2), kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
     model.add(tf.keras.layers.BatchNormalization())
     model.add(tf.keras.layers.Dropout(0.2))
 
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu'))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =1, padding = "same", activation = 'relu'))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
     model.add(tf.keras.layers.BatchNormalization())
-    model.add(tf.keras.layers.Conv2D(filters =10, kernel_size =1, padding = "same", activation = 'relu'))
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2), kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
+    model.add(tf.keras.layers.BatchNormalization())
+    model.add(tf.keras.layers.Dropout(0.2))
+
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
+    model.add(tf.keras.layers.BatchNormalization())
+    model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =1, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
+    model.add(tf.keras.layers.BatchNormalization())
+    model.add(tf.keras.layers.Conv2D(filters =10, kernel_size =1, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.00001)))
     model.add(tf.keras.layers.BatchNormalization())
     model.add(tf.keras.layers.Dropout(0.2))
 
@@ -200,11 +213,17 @@ def setUpModel():
 
 
 def trainModel():
+    # one update step is 1 batch - 1 cycle is step_size * 2 no. of update steps
     # callback used for cyclical learning
-    clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular2')
+
+    # if step_size set to 2500 -> 10 epochs per cycle. 350 total epochs -> 35 cycles, each with decreasing LR (1/2^cycle)
+    # want to try fewer cycles to avoid getting too small LR.
+    # 35 cycles lead to a factor of ~1e-11 multiplied to the LR.
+    # so i try 20 cycles, for the final LR to be multiplied by factor of 1e-7  
+    clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=4375, mode='triangular2')
     
     # callback used to save the model during runtime
-    checkpoint_path = "../WeightsFromTraining/foo.ckpt"
+    checkpoint_path = "../WeightsFromTraining/wednesdaynight/all-ccn-c-datagument-dropout.ckpt"
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
                                                  save_weights_only=True,
                                                  verbose=1)
@@ -212,7 +231,7 @@ def trainModel():
 
     # runs the training procedure
     result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
-                epochs=300, validation_data = (x_test,y_test), callbacks = [clr, cp_callback])
+                epochs=350, validation_data = (x_test,y_test), callbacks = [clr, cp_callback])
 
     # prints the result to csv file
     f= open("../X.csv","w")
@@ -220,24 +239,48 @@ def trainModel():
     acc = result.history["acc"]
     val_loss = result.history["val_loss"]
     val_acc = result.history["val_acc"]
-    f.write("iteration , Loss , acc , valLoss , valAcc\n")
+    f.write("iteration , Loss , acc , valLoss , valAcc, learning_rate\n")
     for i in range(len(loss)):
-    	row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
+    	row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + " ," + str(learning_rate_history[i]) +"\n"
     	f.write(row)
 
     f.close()
 
     return result
 
-loading_checkpoint_path = "../WeightsFromTraining/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
+# loading_checkpoint_path = "../WeightsFromTraining/wednesdaynight/all-ccn-c-datagument-dropout.ckpt"
+
+#used to load the model
+# model = tf.keras.models.load_model("../Models/test.h5")
+# model.summary()
 
 model = setUpModel()
+
 model.evaluate(x_test, y_test)
-model.load_weights(loading_checkpoint_path)
-model.evaluate(x_test, y_test)
-# result = trainModel()
 
+# model.load_weights(loading_checkpoint_path)
+# model.evaluate(x_test, y_test)
 
-
+result = trainModel()
+# print(learning_rate_history)
+model.save("../Models/test.h5")
 
 model.evaluate(x_test, y_test) ##this one can be commented out to reduce read time. 
+
+"""
+trying to run this with
+ADAM
+cyclical learning rate triangular with 20 epochs -> final learning rates will be a factor of 1/2^20 (i.e. 1e-11) of the original LR
+350 epochs
+
+regularization methods:
+3 x dropout 0.2
+data augmentation dynamically
+pre-training data normalization
+LOW L2 regularization on the convnet layers to try and avoid overfitting
+
+
+model saved to: "../Models/test.h5"
+weights saved to: "../WeightsFromTraining/wednesdaynight/all-ccn-c-datagument-dropout.ckpt"
+accuracy results save to : "../X.csv" along with information about the learning rate order of magnitude on each epochs end
+"""

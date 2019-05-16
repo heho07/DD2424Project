@@ -1,2 +1,2 @@
-model_checkpoint_path: "all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
-all_model_checkpoint_paths: "all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
+model_checkpoint_path: "foo.ckpt"
+all_model_checkpoint_paths: "foo.ckpt"
