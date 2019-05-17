@@ -123,12 +123,16 @@ def initializeTraining(iteration_learning_rate):
 
 learning_rates = [0.25, 0.1, 0.05]
 
-for current_iteration_learning_rate in learning_rates:
-    initializeTraining(current_iteration_learning_rate)
+# for current_iteration_learning_rate in learning_rates:
+#     initializeTraining(current_iteration_learning_rate)
+
+# model.evaluate(x_test, y_test)
+model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.05.h5')
+model.summary()
+model.evaluate(x_test, y_test)
 
 
 # loading_checkpoint_path = "../WeightsFromTraining/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
 
 # model.load_weights(loading_checkpoint_path)
-# model.evaluate(x_test, y_test)
 # result = trainModel()
