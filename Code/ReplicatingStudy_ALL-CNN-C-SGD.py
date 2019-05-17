@@ -22,6 +22,7 @@ def lr_schedule(epoch, base_learning_rate):
         lrate = 0.01*base_learning_rate
     if epoch > 300:
         lrate = 0.001*base_learning_rate        
+    print("in lr scheduler with lr as : " + str(lrate))
     return lrate
 
 def check_directory_exists(full_path):
@@ -34,7 +35,7 @@ def check_directory_exists(full_path):
 
 def setUpModel(iteration_learning_rate):
 
-    tf.keras.backend.clear_session()
+    # tf.keras.backend.clear_session()
     model = tf.keras.Sequential()
 
     # apply weight_decay to all the layers.
@@ -49,7 +50,7 @@ def setUpModel(iteration_learning_rate):
 
     # "max-pooling ish" with dropout 0.5 after
     model.add(tf.keras.layers.Conv2D(filters =96, kernel_size =3, padding = "same", activation = 'relu', strides =(2,2), kernel_regularizer=tf.keras.regularizers.l2(l=l2_reg)))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
+    # model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
     model.add(tf.keras.layers.Dropout(0.5))
 
     # Two 3 x 3 conv.96 ReLU
@@ -57,7 +58,7 @@ def setUpModel(iteration_learning_rate):
     model.add(tf.keras.layers.Conv2D(filters =192, kernel_size =3, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(l=l2_reg)))
 
     # "max-pooling" with dropout 0.5 after
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
+    # model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
     model.add(tf.keras.layers.Dropout(0.5))
 
     # One 3 x 3 conv. 192 ReLU
@@ -77,6 +78,7 @@ def setUpModel(iteration_learning_rate):
 
     # SGD optimizer
     # learning rate, one of  [0.25, 0.1, 0.05, 0.01], which one is the best?
+    print("Declaring SGD with learning rate: " + str(iteration_learning_rate))
     sgd = tf.keras.optimizers.SGD(lr=iteration_learning_rate, momentum=0.9) # decay=0.1 on learning rate, but should only be appled to epochs [200,250, 300]
 
     model.compile(optimizer=sgd,
@@ -101,6 +103,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
     #         height_shift_range=0.2,
     #         horizontal_flip=True)
 
+    print("Starting to fit the model with epochs: " + str(number_of_epochs))
     result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
 
 
@@ -141,12 +144,12 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
     model.save(full_path)
     model.evaluate(x_test, y_test)
 
-learning_rates = [0.25, 0.1, 0.05]
+learning_rates = [0.25, 0.1, 0.05, 0.01]
 
 # for current_iteration_learning_rate in learning_rates:
-#     initializeTraining(current_iteration_learning_rate)
+#     initializeTraining(current_iteration_learning_rate, "replicating_study", 350)
 
-initializeTraining(0.05, "replicating_study", 350)
+initializeTraining(0.25, "replicating_study", 350)
 
 # model.evaluate(x_test, y_test)
 # model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
