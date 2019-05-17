@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.python.keras import backend as K
 import csv
 
+import errno
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -13,18 +14,27 @@ x_train = x_train.astype('float32')/255  # .astype('float32')
 x_test = x_test.astype('float32')/255
 
 # checks all the possible epoch states we want to catch
-def lr_schedule(epoch):
-    lrate = 0.01
+def lr_schedule(epoch, base_learning_rate):
+    lrate = base_learning_rate
     if epoch > 200:
-        lrate = 0.001
+        lrate = 0.1*base_learning_rate
     if epoch > 250:
-        lrate = 0.0001
+        lrate = 0.01*base_learning_rate
     if epoch > 300:
-        lrate = 0.00001        
+        lrate = 0.001*base_learning_rate        
     return lrate
+
+def check_directory_exists(full_path):
+    if not os.path.exists(os.path.dirname(full_path)):
+        try:
+            os.makedirs(os.path.dirname(full_path))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
 
 def setUpModel(iteration_learning_rate):
 
+    tf.keras.backend.clear_session()
     model = tf.keras.Sequential()
 
     # apply weight_decay to all the layers.
@@ -75,9 +85,10 @@ def setUpModel(iteration_learning_rate):
 
     return model
 
-def trainModel(model, iteration_learning_rate, number_of_epochs):
+def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
     # callback used to save the model during runtime
-    checkpoint_path = "../WeightsFromTraining/replicatingStudy/learning_rate" + str(iteration_learning_rate) + ".ckpt"
+    checkpoint_path = "../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
+    check_directory_exists(checkpoint_path) 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
@@ -90,7 +101,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs):
     #         height_shift_range=0.2,
     #         horizontal_flip=True)
 
-    result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lr_schedule), cp_callback]) 
+    result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
 
 
 
@@ -98,7 +109,14 @@ def trainModel(model, iteration_learning_rate, number_of_epochs):
     #             epochs=350, validation_data = (x_test,y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback])
 
      # prints the result to csv file
-    f= open("../ResultsFromTraining/replicating_study/learning_rate" + str(iteration_learning_rate) + ".csv","w")
+
+
+    full_path = "../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
+    check_directory_exists(full_path)
+
+
+
+    f= open(full_path,"w")
     loss = result.history["loss"]
     acc = result.history["acc"]
     val_loss = result.history["val_loss"]
@@ -112,13 +130,15 @@ def trainModel(model, iteration_learning_rate, number_of_epochs):
 
     return result
 
-def initializeTraining(iteration_learning_rate):
+def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 5):
     print("starting with learning rate " + str(iteration_learning_rate))
     model = setUpModel(iteration_learning_rate)
-    epochs = 350
-    trainModel(model, iteration_learning_rate, epochs)
+    
+    trainModel(model, iteration_learning_rate, epochs, folder_name)
 
-    model.save("../Models/replicating_study/learning_rate" + str(iteration_learning_rate) + ".h5")
+    full_path ="../Models/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".h5"
+    check_directory_exists(full_path) 
+    model.save(full_path)
     model.evaluate(x_test, y_test)
 
 learning_rates = [0.25, 0.1, 0.05]
@@ -126,10 +146,12 @@ learning_rates = [0.25, 0.1, 0.05]
 # for current_iteration_learning_rate in learning_rates:
 #     initializeTraining(current_iteration_learning_rate)
 
+initializeTraining(0.05, "replicating_study", 350)
+
 # model.evaluate(x_test, y_test)
-model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.05.h5')
-model.summary()
-model.evaluate(x_test, y_test)
+# model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
+# model.summary()
+# model.evaluate(x_test, y_test)
 
 
 # loading_checkpoint_path = "../WeightsFromTraining/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
