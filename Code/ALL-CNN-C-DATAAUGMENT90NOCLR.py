@@ -84,13 +84,13 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
                                                      save_weights_only=True,
                                                      verbose=1)
 
-    # datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
-    #         featurewise_center=False,
-    #         featurewise_std_normalization=False,
-    #         rotation_range=20,
-    #         width_shift_range=0.2,
-    #         height_shift_range=0.2,
-    #         horizontal_flip=True)
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
+		featurewise_center=False,
+		featurewise_std_normalization=False,
+		rotation_range=20,
+		width_shift_range=0.2,
+		height_shift_range=0.2,
+		horizontal_flip=True)
 
     result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 32, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
 
@@ -102,7 +102,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
      # prints the result to csv file
 
 
-    full_path = "../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
+    full_path = "./X"+ ".csv"
     #check_directory_exists(full_path)
 
 
@@ -121,7 +121,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
 
     return result
 
-def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 350):
+def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 5):
     print("starting with learning rate " + str(iteration_learning_rate))
     model = setUpModel(iteration_learning_rate)
     
@@ -137,7 +137,7 @@ learning_rates = [0.25, 0.1, 0.05]
 # for current_iteration_learning_rate in learning_rates:
 #     initializeTraining(current_iteration_learning_rate)
 
-initializeTraining(0.05, "replicating_study", 350)
+initializeTraining(0.01, "replicating_study", 350)
 
 # model.evaluate(x_test, y_test)
 # model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
