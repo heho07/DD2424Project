@@ -43,7 +43,7 @@ def visualize_layer_output(layer_output):
     for i in range(depth):
         plt.subplot(nb_plot, nb_plot, i+1)
         plt.imshow(layer_output[:,:,i], cmap='gray')
-        plt.title('feature map {}'.format(i+1))
+        plt.title('l: {}'.format(i+1))
     plt.show()
 
 truck_output_layer_6 = get_nth_layer_output(6, truck_image)
