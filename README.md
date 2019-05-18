@@ -6,7 +6,7 @@
 
 * [Code](https://github.com/heho07/DD2424Project/tree/master/Code) directory contains the source code of the modal being experimented in this project.
 
-  * [replicating_study_SGD](https://github.com/heho07/DD2424Project/tree/master/Code/replicating_study_SGD) directory contains the modal we used to the replication experiment of study [Striving for Simplicity: The All Convolutional Net](https://arxiv.org/pdf/1412.6806.pdf).
+  * [replicating_study_SGD](https://github.com/heho07/DD2424Project/tree/master/Code/replicating_study_SGD) directory contains the modal used in study [Striving for Simplicity: The All Convolutional Net](https://arxiv.org/pdf/1412.6806.pdf).
 
   * [ALL-CNNC_improved_models](https://github.com/heho07/DD2424Project/tree/master/Code/ALL-CNNC_improved_models) directory contains the improved modal we implemented.
 
