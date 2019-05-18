@@ -149,7 +149,11 @@ learning_rates = [0.25, 0.1, 0.05, 0.01]
 # for current_iteration_learning_rate in learning_rates:
 #     initializeTraining(current_iteration_learning_rate, "replicating_study", 350)
 
+<<<<<<< HEAD
 initializeTraining(0.25, "replicating_study", 5)
+=======
+initializeTraining(0.01, "replicating_study", 350)
+>>>>>>> 9eaf1c8f636cd5c5bab8acd53c7aa379404c01f7
 
 # model.evaluate(x_test, y_test)
 # model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
