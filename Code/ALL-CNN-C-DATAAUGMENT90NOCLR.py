@@ -92,6 +92,17 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
+# for google cloud:
+    if environment == "googleCloud":
+        model_checkpoint_path = "./model"+ ".h5"
+# for herman PC:
+    elif environment == "hermanPC":
+        model_checkpoint_path = "../Models/"+folder_name+"/modelCheckpoint_learning_rate" + str(iteration_learning_rate) + ".h5"
+        check_directory_exists(checkpoint_path) 
+    else:
+        model_checkpoint_path = "./model"+ ".h5"
+
+    cp_callback_model = tf.keras.callbacks.ModelCheckpoint(model_checkpoint_path, monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 
     datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
 		featurewise_center=False,
@@ -101,7 +112,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
 		height_shift_range=0.2,
 		horizontal_flip=True)
 
-    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size = 32), epochs=number_of_epochs, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
+    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size = 32), epochs=number_of_epochs, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback, cp_callback_model]) 
 
 
 
