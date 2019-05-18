@@ -55,6 +55,7 @@ def get_and_visualize_layer_output(layer, image, model_name = "foo", show = True
     truck_output_layer_n = get_nth_layer_output(layer, image)
     visualize_layer_output(truck_output_layer_n, model_name, layer, show)
 
-
-get_and_visualize_layer_output(6, truck_image, "replicating_study_learning_rate0.01", True)
+for i in range(len(model.layers)):
+    get_and_visualize_layer_output(i, truck_image, "replicating_study_learning_rate0.01", True)
+    
 
