@@ -251,38 +251,48 @@ def trainModel():
 
 frog2 = np.asarray(frog)
 print(frog2.shape)
-plt.figure()
-plt.imshow(frog2)
-plt.show()
+# plt.figure()
+# plt.imshow(frog2)
+# plt.show()
+
+loading_checkpoint_path = "./Models/replicating_study/learning_rate0.01.h5"
+model = tf.keras.models.load_model(loading_checkpoint_path)
+model.evaluate(x_test, y_test)
+
 
 # with a Sequential model
 cat_batch = np.expand_dims(frog2,axis=0)
-# get_3rd_layer_output = K.function([model.layers[0].input],
-#                                   [model.layers[2].output])
-# layer_output = get_3rd_layer_output([cat_batch])[0]
-# layer_output = np.squeeze(layer_output, axis = 0)
+get_3rd_layer_output = K.function([model.layers[0].input],
+                                  [model.layers[3].output])
+layer_output = get_3rd_layer_output([cat_batch])[0]
 
-# height, width, depth = layer_output.shape
-# nb_plot = int(np.rint(np.sqrt(depth)))
-# fig = plt.figure(figsize=(20, 20))
-# for i in range(depth):
-#     plt.subplot(nb_plot, nb_plot, i+1)
-#     plt.imshow(layer_output[:,:,i], cmap='gray')
-#     plt.title('feature map {}'.format(i+1))
-# plt.show()
+get_6th_layer_output = K.function([model.layers[0].input],
+                                  [model.layers[2].output])
+layer_output = get_6th_layer_output([cat_batch])[0]
 
-datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
-        zca_whitening = True
-        )
-datagen.fit(cat_batch)
-cat = np.squeeze(cat_batch, axis = 0)
-plt.figure()
+layer_output = np.squeeze(layer_output, axis = 0)
+
+height, width, depth = layer_output.shape
+nb_plot = int(np.rint(np.sqrt(depth)))
+fig = plt.figure(figsize=(20, 20))
+for i in range(depth):
+    plt.subplot(nb_plot, nb_plot, i+1)
+    plt.imshow(layer_output[:,:,i], cmap='gray')
+    plt.title('feature map {}'.format(i+1))
+plt.show()
+
+# datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
+#         zca_whitening = True
+#         )
+# datagen.fit(cat_batch)
+# cat = np.squeeze(cat_batch, axis = 0)
+# plt.figure()
 # cat3 = datagen.flow(cat_batch)
 # cat3 = np.squeeze(cat3, axis = 0)
-cat3 = datagen.standardize((cat))
-print(cat3.shape)
-plt.imshow(cat3)
-plt.show()
+# cat3 = datagen.standardize((cat))
+# print(cat3.shape)
+# plt.imshow(cat3)
+# plt.show()
 
 
 
