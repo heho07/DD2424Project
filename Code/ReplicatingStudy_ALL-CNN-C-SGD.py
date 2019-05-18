@@ -89,23 +89,22 @@ def setUpModel(iteration_learning_rate):
 
 def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name = "foo"):
     # callback used to save the model during runtime
-    checkpoint_path = "./"+ ".ckpt"
+    checkpoint_path = "./Weightstest"+ ".ckpt"
    # check_directory_exists(checkpoint_path) 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
-
-    # datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
-    #         featurewise_center=False,
-    #         featurewise_std_normalization=False,
-    #         rotation_range=20,
-    #         width_shift_range=0.2,
-    #         height_shift_range=0.2,
-    #         horizontal_flip=True)
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
+        featurewise_center=False,
+        featurewise_std_normalization=False,
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        horizontal_flip=True)
 
     print("Starting to fit the model with epochs: " + str(number_of_epochs))
-    result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
-
+    #result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 100, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
+    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size = 32), epochs=number_of_epochs, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback]) 
 
 
     # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
@@ -139,7 +138,7 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
     
     trainModel(model, iteration_learning_rate, epochs, folder_name)
 
-    full_path ="./"+".h5"
+    full_path ="./Modeltest"+".h5"
    # check_directory_exists(full_path) 
     model.save(full_path)
     model.evaluate(x_test, y_test)
@@ -149,11 +148,9 @@ learning_rates = [0.25, 0.1, 0.05, 0.01]
 # for current_iteration_learning_rate in learning_rates:
 #     initializeTraining(current_iteration_learning_rate, "replicating_study", 350)
 
-<<<<<<< HEAD
-initializeTraining(0.25, "replicating_study", 5)
-=======
+
 initializeTraining(0.01, "replicating_study", 350)
->>>>>>> 9eaf1c8f636cd5c5bab8acd53c7aa379404c01f7
+
 
 # model.evaluate(x_test, y_test)
 # model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
