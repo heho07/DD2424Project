@@ -241,20 +241,22 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
 
     cp_callback_model = tf.keras.callbacks.ModelCheckpoint(model_checkpoint_path, monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
-		featurewise_center=False,
-		featurewise_std_normalization=False,
-		rotation_range=20,
-		width_shift_range=0.2,
-		height_shift_range=0.2,
-		horizontal_flip=True)
+    #datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
+		#featurewise_center=False,
+		#featurewise_std_normalization=False,
+		#rotation_range=20,
+		#width_shift_range=0.2,
+		#height_shift_range=0.2,
+		#horizontal_flip=True)
 
     #result = model.fit_generator(datagen.flow(x_train, y_train, batch_size = 32), epochs=number_of_epochs, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback, cp_callback_model]) 
 
-    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32),
-                epochs=350, validation_data = (x_test,y_test), callbacks = [clr, cp_callback,cp_callback_model])
+   # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32),
+   #             epochs=350, validation_data = (x_test,y_test), callbacks = [clr, cp_callback,cp_callback_model])
 
-    # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
+    result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 32, validation_data = (x_test, y_test), callbacks = [clr, cp_callback,cp_callback_model]) 
+	
+	# result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
     #             epochs=350, validation_data = (x_test,y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback])
 
      # prints the result to csv file
