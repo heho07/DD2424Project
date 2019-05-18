@@ -25,13 +25,13 @@ def lr_schedule(epoch, base_learning_rate):
     print("in lr scheduler with lr as : " + str(lrate))
     return lrate
 
-def check_directory_exists(full_path):
-    if not os.path.exists(os.path.dirname(full_path)):
-        try:
-            os.makedirs(os.path.dirname(full_path))
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
+# def check_directory_exists(full_path):
+   # if not os.path.exists(os.path.dirname(full_path)):
+       # try:
+           # os.makedirs(os.path.dirname(full_path))
+       # except OSError as exc: # Guard against race condition
+           # if exc.errno != errno.EEXIST:
+               # raise
 
 def setUpModel(iteration_learning_rate):
 
@@ -87,10 +87,10 @@ def setUpModel(iteration_learning_rate):
 
     return model
 
-def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
+def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name = "foo"):
     # callback used to save the model during runtime
-    checkpoint_path = "../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
-    check_directory_exists(checkpoint_path) 
+    checkpoint_path = "./"+ ".ckpt"
+   # check_directory_exists(checkpoint_path) 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
@@ -114,8 +114,8 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
      # prints the result to csv file
 
 
-    full_path = "../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
-    check_directory_exists(full_path)
+    full_path = "X"+".csv"
+    #check_directory_exists(full_path)
 
 
 
@@ -139,8 +139,8 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
     
     trainModel(model, iteration_learning_rate, epochs, folder_name)
 
-    full_path ="../Models/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".h5"
-    check_directory_exists(full_path) 
+    full_path ="./"+".h5"
+   # check_directory_exists(full_path) 
     model.save(full_path)
     model.evaluate(x_test, y_test)
 
@@ -149,7 +149,7 @@ learning_rates = [0.25, 0.1, 0.05, 0.01]
 # for current_iteration_learning_rate in learning_rates:
 #     initializeTraining(current_iteration_learning_rate, "replicating_study", 350)
 
-initializeTraining(0.25, "replicating_study", 350)
+initializeTraining(0.25, "replicating_study", 5)
 
 # model.evaluate(x_test, y_test)
 # model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
