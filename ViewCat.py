@@ -31,7 +31,7 @@ def get_nth_layer_output(layer, image):
     image = np.expand_dims(image,axis=0)
     get_layer_output = K.function([model.layers[0].input],
                                       [model.layers[layer].output])
-    layer_output = get_3rd_layer_output([image])[0]
+    layer_output = get_layer_output([image])[0]
     layer_output = np.squeeze(layer_output, axis = 0)
     return layer_output
 
