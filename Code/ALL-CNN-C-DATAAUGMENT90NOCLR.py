@@ -24,13 +24,13 @@ def lr_schedule(epoch, base_learning_rate):
         lrate = 0.001*base_learning_rate        
     return lrate
 
-#def check_directory_exists(full_path):
- #   if not os.path.exists(os.path.dirname(full_path)):
-  #      try:
-   #         os.makedirs(os.path.dirname(full_path))
-    #    except OSError as exc: # Guard against race condition
-     #       if exc.errno != errno.EEXIST:
-      #          raise
+def check_directory_exists(full_path):
+   if not os.path.exists(os.path.dirname(full_path)):
+       try:
+           os.makedirs(os.path.dirname(full_path))
+       except OSError as exc: # Guard against race condition
+           if exc.errno != errno.EEXIST:
+               raise
 
 def setUpModel(iteration_learning_rate):
 
@@ -76,10 +76,19 @@ def setUpModel(iteration_learning_rate):
 
     return model
 
-def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
+def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, environment):
     # callback used to save the model during runtime
-    checkpoint_path = "./"+ ".ckpt"
-  #  check_directory_exists(checkpoint_path) 
+
+# for google cloud:
+    if environment == "googleCloud":
+        checkpoint_path = "./weights"+ ".ckpt"
+# for herman PC:
+    elif environment == "hermanPC":
+        checkpoint_path = "../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
+        check_directory_exists(checkpoint_path) 
+    else:
+        checkpoint_path = "./weights"+ ".ckpt"
+
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
@@ -102,50 +111,62 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
      # prints the result to csv file
 
 
-    full_path = "./X"+ ".csv"
-    #check_directory_exists(full_path)
+# for google cloud: 
+    if environment == "googleCloud":
+        full_path = "./X"+ ".csv"
+#for herman PC:
+    elif environment == "hermanPC":
+        full_path = "../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
+        check_directory_exists(full_path)
+    else:
+        full_path = "./X"+ ".csv"
 
+    try:
+        f= open(full_path,"w")
+        loss = result.history["loss"]
+        acc = result.history["acc"]
+        val_loss = result.history["val_loss"]
+        val_acc = result.history["val_acc"]
+        f.write("iteration , Loss , acc , valLoss , valAcc\n")
+        for i in range(len(loss)):
+            row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
+            f.write(row)
 
-
-    f= open(full_path,"w")
-    loss = result.history["loss"]
-    acc = result.history["acc"]
-    val_loss = result.history["val_loss"]
-    val_acc = result.history["val_acc"]
-    f.write("iteration , Loss , acc , valLoss , valAcc\n")
-    for i in range(len(loss)):
-        row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
-        f.write(row)
-
-    f.close()
+        f.close()
+    except:
+        print("error occured")
 
     return result
 
-def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 5):
+def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 5, environment = "googleCloud"):
     print("starting with learning rate " + str(iteration_learning_rate))
     model = setUpModel(iteration_learning_rate)
     
-    trainModel(model, iteration_learning_rate, epochs, folder_name)
+    trainModel(model, iteration_learning_rate, epochs, folder_name, environment)
+    full_path = ""
 
-    full_path ="./"+".h5"
-    #check_directory_exists(full_path) 
+# for google cloud:
+    if environment == "googleCloud":
+        full_path ="./model"+".h5"
+        
+# for herman PC:
+    elif environment == "hermanPC":
+        full_path ="../Models/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".h5"
+        check_directory_exists(full_path) 
+    else:
+        full_path == "./model.h5"
+
     model.save(full_path)
     model.evaluate(x_test, y_test)
 
-learning_rates = [0.25, 0.1, 0.05]
 
-# for current_iteration_learning_rate in learning_rates:
-#     initializeTraining(current_iteration_learning_rate)
 
-initializeTraining(0.01, "replicating_study", 350)
+initializeTraining(0.01, "all-cnn-c-dataaugment90noclr", 350, "hermanPC")
 
-# model.evaluate(x_test, y_test)
-# model = tf.keras.models.load_model('../Models/replicating_study/learning_rate0.01.h5')
-# model.summary()
+# for loading the model see:
+# loading_checkpoint_path = "../Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"
+# model = tf.keras.models.load_model(loading_checkpoint_path)
 # model.evaluate(x_test, y_test)
 
 
-# loading_checkpoint_path = "../WeightsFromTraining/all-cnn-c-dataaugment-dropout-400epochs-startingFrom90percent.ckpt"
 
-# model.load_weights(loading_checkpoint_path)
-# result = trainModel()

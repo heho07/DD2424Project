@@ -84,6 +84,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
 # for herman PC:
     checkpoint_path = "../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
     check_directory_exists(checkpoint_path) 
+    
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
@@ -111,18 +112,20 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name):
     full_path = "../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
     check_directory_exists(full_path)
 
+    try:
+        f= open(full_path,"w")
+        loss = result.history["loss"]
+        acc = result.history["acc"]
+        val_loss = result.history["val_loss"]
+        val_acc = result.history["val_acc"]
+        f.write("iteration , Loss , acc , valLoss , valAcc\n")
+        for i in range(len(loss)):
+            row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
+            f.write(row)
 
-    f= open(full_path,"w")
-    loss = result.history["Training_loss"]
-    acc = result.history["Training_accuracy"]
-    val_loss = result.history["Validation_loss"]
-    val_acc = result.history["Validation_accuracy"]
-    f.write("iteration , Loss , acc , valLoss , valAcc\n")
-    for i in range(len(loss)):
-        row = str(i+1) + " ," + str(loss[i]) + " ,"  + str(acc[i]) + " ," + str(val_loss[i]) + " ," + str(val_acc[i]) + "\n"
-        f.write(row)
-
-    f.close()
+        f.close()
+    except:
+        print("Error occured when saving results")
 
     return result
 

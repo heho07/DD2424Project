@@ -147,13 +147,13 @@ class CyclicLR(tf.keras.callbacks.Callback):
 
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
-# x_train = x_train.astype('float32')/255  # .astype('float32')
-# x_test = x_test.astype('float32')/255
+x_train = x_train.astype('float32')/255  # .astype('float32')
+x_test = x_test.astype('float32')/255
 
-mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
-std = np.std(x_train,axis=(0,1,2,3))
-x_train = (x_train-mean)/(std+1e-7)
-x_test = (x_test-mean)/(std+1e-7) 
+# mean = np.mean(x_train,axis=(0,1,2,3))  #(0,1,2,3)
+# std = np.std(x_train,axis=(0,1,2,3))
+# x_train = (x_train-mean)/(std+1e-7)
+# x_test = (x_test-mean)/(std+1e-7) 
 
 frog = x_train[1,:]
 
@@ -237,12 +237,12 @@ def trainModel():
 
 # loading_checkpoint_path = "WeightsFromTraining/pictures/frog-0010.ckpt"
 
-model = setUpModel()
+# model = setUpModel()
 
 # model.evaluate(x_test, y_test)
 # model.load_weights(loading_checkpoint_path)
 # model.evaluate(x_test, y_test)
-result = trainModel()
+# result = trainModel()
 
 
 # cat = imread("cat.png")
@@ -251,20 +251,37 @@ result = trainModel()
 
 frog2 = np.asarray(frog)
 print(frog2.shape)
+plt.figure()
+plt.imshow(frog2)
+plt.show()
+
 # with a Sequential model
 cat_batch = np.expand_dims(frog2,axis=0)
-get_3rd_layer_output = K.function([model.layers[0].input],
-                                  [model.layers[2].output])
-layer_output = get_3rd_layer_output([cat_batch])[0]
-layer_output = np.squeeze(layer_output, axis = 0)
+# get_3rd_layer_output = K.function([model.layers[0].input],
+#                                   [model.layers[2].output])
+# layer_output = get_3rd_layer_output([cat_batch])[0]
+# layer_output = np.squeeze(layer_output, axis = 0)
 
-height, width, depth = layer_output.shape
-nb_plot = int(np.rint(np.sqrt(depth)))
-fig = plt.figure(figsize=(20, 20))
-for i in range(depth):
-    plt.subplot(nb_plot, nb_plot, i+1)
-    plt.imshow(layer_output[:,:,i], cmap='gray')
-    plt.title('feature map {}'.format(i+1))
+# height, width, depth = layer_output.shape
+# nb_plot = int(np.rint(np.sqrt(depth)))
+# fig = plt.figure(figsize=(20, 20))
+# for i in range(depth):
+#     plt.subplot(nb_plot, nb_plot, i+1)
+#     plt.imshow(layer_output[:,:,i], cmap='gray')
+#     plt.title('feature map {}'.format(i+1))
+# plt.show()
+
+datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
+        zca_whitening = True
+        )
+datagen.fit(cat_batch)
+cat = np.squeeze(cat_batch, axis = 0)
+plt.figure()
+# cat3 = datagen.flow(cat_batch)
+# cat3 = np.squeeze(cat3, axis = 0)
+cat3 = datagen.standardize((cat))
+print(cat3.shape)
+plt.imshow(cat3)
 plt.show()
 
 
