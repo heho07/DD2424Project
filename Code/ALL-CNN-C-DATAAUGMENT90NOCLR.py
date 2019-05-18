@@ -138,6 +138,8 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
 
     return result
 
+# takes in inital learning rate, what folder to save results in, how many epochs to run for
+# as well as what environment it will be run on - either googleCloud or hermanPC
 def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 5, environment = "googleCloud"):
     print("starting with learning rate " + str(iteration_learning_rate))
     model = setUpModel(iteration_learning_rate)
