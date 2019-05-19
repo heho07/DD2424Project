@@ -56,6 +56,8 @@ def get_and_visualize_layer_output(layer, image, model_name = "foo", show = True
     visualize_layer_output(truck_output_layer_n, model_name, layer, show)
 
 for i in range(len(model.layers)):
-    get_and_visualize_layer_output(i, truck_image, "replicating_study_learning_rate0.01", True)
-    
+    try:
+        get_and_visualize_layer_output(i, truck_image, "replicating_study_learning_rate0.01", True)
+    except:
+        print("error on layer " + str(i))
 
