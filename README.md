@@ -13,3 +13,5 @@
 * [ResultsFromtraining](https://github.com/heho07/DD2424Project/tree/master/ResultsFromTraining) directory contins our training && validation results in `.csv` format.
 
 * [WeightsFromTraining](https://github.com/heho07/DD2424Project/tree/master/WeightsFromTraining) directory contains the `weights` saved from running each `epoch` with our training model.
+
+* [Models](https://github.com/heho07/DD2424Project/tree/master/Models) directory contains the `models` saved from running each `epoch` with out training model. Using these it is able to use the model after training has finished.
