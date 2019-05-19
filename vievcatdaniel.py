@@ -26,10 +26,10 @@ truck_image = x_train[0,:]
 truck_image = np.asarray(truck_image)
 
 #loading the model we want to visualize
-loading_checkpoint_path = "./Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"
+loading_checkpoint_path = "./Models/replicating_study/learning_rate0.01.h5"
 model = tf.keras.models.load_model(loading_checkpoint_path)
 model.summary()
-#model.evaluate(x_test, y_test)  #checking that it works
+model.evaluate(x_test, y_test)  #checking that it works
 
 def check_directory_exists(full_path):
    if not os.path.exists(os.path.dirname(full_path)):
@@ -90,16 +90,16 @@ def get_original_image(image, image_name):
 
 lower_image_bound = 1
 upper_image_bound = 10
-
+folder = replicating_study
 for j in range(lower_image_bound,upper_image_bound):
     truck_image = x_train[j,:]
     truck_image = np.asarray(truck_image)
-    get_original_image(truck_image, "all-cnn-c-dataugment90noclr/image"+str(j)+"/original_image")
+    get_original_image(truck_image, folder+"/image"+str(j)+"/original_image")
     truck_image = np.expand_dims(truck_image,axis=0)
     for i in range(len(model.layers)):    
         print("getting visualization of layer " + str(i) + " for image " + str(j))
         try:
-            get_and_visualize_layer_output(i, truck_image, "all-cnn-c-dataugment90noclr/image" + str(j), False)
+            get_and_visualize_layer_output(i, truck_image, folder + "/image" + str(j), False)
         except KeyboardInterrupt:
             sys.exit("user exited program")
         except:
