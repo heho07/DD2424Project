@@ -1,4 +1,4 @@
-# DD2424 Deep Learning Project
+# DD2424 Deep Learning Project VT19 Group 36
 
 [Tensorflow](https://www.tensorflow.org/) is requrired to run this project. We mainly run and experiment on `GPU` enabled machines.
 
