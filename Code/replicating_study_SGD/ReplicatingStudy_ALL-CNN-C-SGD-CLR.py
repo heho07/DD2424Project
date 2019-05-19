@@ -227,7 +227,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
-    clr = CyclicLR(base_lr=0.001, max_lr=0.006, step_size=7815, mode='triangular2')
+    clr = CyclicLR(base_lr=0.01, max_lr=0.06, step_size=7815, mode='triangular2')
 													 
 # for google cloud:
     if environment == "googleCloud":
@@ -314,7 +314,7 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
 
 
 
-initializeTraining(0.01,"foo", 350, "googleCloud")
+initializeTraining(0.01,"foo", 100, "googleCloud")
 
 # for loading the model see:
 # loading_checkpoint_path = "../Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"
