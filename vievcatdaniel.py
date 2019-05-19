@@ -22,11 +22,11 @@ x_test = x_test.astype('float32')/255
 
 truck_image = x_train[1,:]
 truck_image = np.asarray(truck_image)
-truck_image = np.expand_dims(truck_image,axis=0)
 
 #loading the model we want to visualize
-loading_checkpoint_path = "./Models/replicating_study/learning_rate0.01.h5"
+loading_checkpoint_path = "./Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"
 model = tf.keras.models.load_model(loading_checkpoint_path)
+model.summary()
 #model.evaluate(x_test, y_test)  #checking that it works
 
 
@@ -51,16 +51,27 @@ def visualize_layer_output(layer_output, model_name, layer, show = True):
     plt.savefig('./images/layer_visualization/' + model_name + '_layer_' + str(layer) + ".png")
     if show:
         plt.show()
+    plt.close()
         
-
+# gets input layer and visualizes it
 def get_and_visualize_layer_output(layer, image, model_name = "foo", show = True):
     truck_output_layer_n = get_nth_layer_output(layer, image)
     visualize_layer_output(truck_output_layer_n, model_name, layer, show)
 
-for i in range(len(model.layers)):
-    
+# saves the original image to file
+def get_original_image(image, image_name):
+    plt.figure()
+    plt.imshow(image)
+    plt.title('original image')
+    plt.savefig('./images/layer_visualization/'+image_name+'.png')
+
+
+
+truck_image = np.expand_dims(truck_image,axis=0)
+for i in range(len(model.layers)):    
+    print("getting visualization of layer " + str(i))
     try:
-        get_and_visualize_layer_output(i, truck_image, "replicating_study_learning_rate0.01", True)
+        get_and_visualize_layer_output(i, truck_image, "all-cnn-c-dataugment90noclr", False)
     except:
         print("error on layer " + str(i))
 
