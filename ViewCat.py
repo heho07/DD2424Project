@@ -19,18 +19,19 @@ x_train = x_train.astype('float32')/255
 x_test = x_test.astype('float32')/255
 
 # image of a truck
+
 truck_image = x_train[1,:]
 truck_image = np.asarray(truck_image)
+truck_image = np.expand_dims(truck_image,axis=0)
 
 #loading the model we want to visualize
 loading_checkpoint_path = "./Models/replicating_study/learning_rate0.01.h5"
 model = tf.keras.models.load_model(loading_checkpoint_path)
-model.evaluate(x_test, y_test)  #checking that it works
+#model.evaluate(x_test, y_test)  #checking that it works
 
 
 # get the layer output from a certain layer
 def get_nth_layer_output(layer, image):
-    image = np.expand_dims(image,axis=0)
     get_layer_output = K.function([model.layers[0].input],
                                       [model.layers[layer].output])
     layer_output = get_layer_output([image])[0]
@@ -43,10 +44,11 @@ def visualize_layer_output(layer_output, model_name, layer, show = True):
     nb_plot = int(np.rint(np.sqrt(depth)))
     fig = plt.figure(figsize=(20, 20))
     for i in range(depth):
+        #print(nb_plot)
         plt.subplot(nb_plot, nb_plot, i+1)
         plt.imshow(layer_output[:,:,i], cmap='gray')
         plt.title('l: {}'.format(i+1))
-    plt.savefig('./images/layer_visualization/' + model_name + '_layer_' + str(layer))
+    plt.savefig('./images/layer_visualization/' + model_name + '_layer_' + str(layer) + ".png")
     if show:
         plt.show()
         
@@ -56,6 +58,9 @@ def get_and_visualize_layer_output(layer, image, model_name = "foo", show = True
     visualize_layer_output(truck_output_layer_n, model_name, layer, show)
 
 for i in range(len(model.layers)):
-    get_and_visualize_layer_output(i, truck_image, "replicating_study_learning_rate0.01", True)
+    #try:
+        get_and_visualize_layer_output(i, truck_image, "replicating_study_learning_rate0.01", False)
+    #except:
+        #print("error on layer" + str(i))
     
 
