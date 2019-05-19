@@ -90,7 +90,7 @@ def get_original_image(image, image_name):
 
 lower_image_bound = 1
 upper_image_bound = 10
-folder = replicating_study
+folder = "replicating_study"
 for j in range(lower_image_bound,upper_image_bound):
     truck_image = x_train[j,:]
     truck_image = np.asarray(truck_image)
