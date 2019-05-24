@@ -136,12 +136,12 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
     print("starting with learning rate " + str(iteration_learning_rate))
     model = setUpModel(iteration_learning_rate)
     
-    trainModel(model, iteration_learning_rate, epochs, folder_name)
-
-    full_path ="./Modeltest"+".h5"
+    # trainModel(model, iteration_learning_rate, epochs, folder_name)
+    # model.summary()
+    # full_path ="./Modeltest"+".h5"
    # check_directory_exists(full_path) 
-    model.save(full_path)
-    model.evaluate(x_test, y_test)
+    # model.save(full_path)
+    # model.evaluate(x_test, y_test)
 
 learning_rates = [0.25, 0.1, 0.05, 0.01]
 
