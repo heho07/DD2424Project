@@ -143,9 +143,13 @@ class CyclicLR(tf.keras.callbacks.Callback):
             self.history.setdefault(k, []).append(v)
         
         K.set_value(self.model.optimizer.lr, self.clr())
+    
     def on_epoch_end(self, epoch, logs=None):
-        print(self.clr())
-        print(self.base_lr)
+        if epoch == 200 or epoch == 250 or epoch == 300:
+            self.learning_rate_decay*= 0.1
+
+        print("clr: " + str(self.clr()))
+        print("learning rate decay factor: " + str(self.learning_rate_decay))
 
 def check_directory_exists(full_path):
    if not os.path.exists(os.path.dirname(full_path)):
@@ -240,7 +244,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
         model_checkpoint_path = "./model"+ ".h5"
 # for herman PC:
     elif environment == "hermanPC":
-        model_checkpoint_path = "../Models/"+folder_name+"/modelCheckpoint_learning_rate" + str(iteration_learning_rate) + ".h5"
+        model_checkpoint_path = "../../Models/"+folder_name+"/modelCheckpoint_learning_rate" + str(iteration_learning_rate) + ".h5"
         check_directory_exists(checkpoint_path) 
     else:
         model_checkpoint_path = "./model"+ ".h5"
@@ -273,7 +277,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
         full_path = "./X"+ ".csv"
 #for herman PC:
     elif environment == "hermanPC":
-        full_path = "../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
+        full_path = "../../ResultsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".csv"
         check_directory_exists(full_path)
     else:
         full_path = "./X"+ ".csv"
@@ -310,7 +314,7 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
         
 # for herman PC:
     elif environment == "hermanPC":
-        full_path ="../Models/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".h5"
+        full_path ="../../Models/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".h5"
         check_directory_exists(full_path) 
     else:
         full_path == "./model.h5"
@@ -320,7 +324,7 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
 
 
 
-initializeTraining(0.01,"foo", 350, "hermanPC")
+initializeTraining(0.01,"replicating_study_SGD_dataaugment_batchnorm_clr", 2, "hermanPC")
 
 # for loading the model see:
 # loading_checkpoint_path = "../Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"

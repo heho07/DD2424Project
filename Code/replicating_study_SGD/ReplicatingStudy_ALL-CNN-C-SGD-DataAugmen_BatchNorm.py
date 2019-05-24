@@ -155,6 +155,19 @@ def check_directory_exists(full_path):
            if exc.errno != errno.EEXIST:
                raise
 
+# checks all the possible epoch states we want to catch
+def lr_schedule(epoch, base_learning_rate):
+    lrate = base_learning_rate
+    if epoch > 200:
+        lrate = 0.1*base_learning_rate
+    if epoch > 250:
+        lrate = 0.01*base_learning_rate
+    if epoch > 300:
+        lrate = 0.001*base_learning_rate        
+    print("in lr scheduler with lr as : " + str(lrate))
+    return lrate
+
+
 def setUpModel(iteration_learning_rate):
 
     tf.keras.backend.clear_session()
