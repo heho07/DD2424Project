@@ -98,6 +98,7 @@ class CyclicLR(tf.keras.callbacks.Callback):
         self.clr_iterations = 0.
         self.trn_iterations = 0.
         self.history = {}
+        self.learning_rate_decay = 1
 
         self._reset()
 
@@ -229,7 +230,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
         checkpoint_path = "./weights"+ ".ckpt"
 # for herman PC:
     elif environment == "hermanPC":
-        checkpoint_path = "../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
+        checkpoint_path = "../../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
         check_directory_exists(checkpoint_path) 
     else:
         checkpoint_path = "./weights"+ ".ckpt"
@@ -245,7 +246,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
 # for herman PC:
     elif environment == "hermanPC":
         model_checkpoint_path = "../../Models/"+folder_name+"/modelCheckpoint_learning_rate" + str(iteration_learning_rate) + ".h5"
-        check_directory_exists(checkpoint_path) 
+        check_directory_exists(model_checkpoint_path) 
     else:
         model_checkpoint_path = "./model"+ ".h5"
 
@@ -324,7 +325,7 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
 
 
 
-initializeTraining(0.01,"replicating_study_SGD_dataaugment_batchnorm_clr", 2, "hermanPC")
+initializeTraining(0.01,"replicating_study_SGD_dataaugment_batchnorm_clr", 350, "hermanPC")
 
 # for loading the model see:
 # loading_checkpoint_path = "../Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"
