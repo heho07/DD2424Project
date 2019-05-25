@@ -18,7 +18,7 @@ class CyclicLR(tf.keras.callbacks.Callback):
     """This callback implements a cyclical learning rate policy (CLR).
     The method cycles the learning rate between two boundaries with
     some constant frequency, as detailed in this paper (https://arxiv.org/abs/1506.01186).
-    The amplitude of the cycle can be scaled on a per-iteration or 
+    The amplitude of the cycle can be scaled on a per-iteration or
     per-cycle basis.
     This class has three built-in policies, as put forth in the paper.
     "triangular":
@@ -26,17 +26,17 @@ class CyclicLR(tf.keras.callbacks.Callback):
     "triangular2":
         A basic triangular cycle that scales initial amplitude by half each cycle.
     "exp_range":
-        A cycle that scales initial amplitude by gamma**(cycle iterations) at each 
+        A cycle that scales initial amplitude by gamma**(cycle iterations) at each
         cycle iteration.
     For more detail, please see paper.
-    
+
     # Example
         ```python
             clr = CyclicLR(base_lr=0.001, max_lr=0.006,
                                 step_size=2000., mode='triangular')
             model.fit(X_train, Y_train, callbacks=[clr])
         ```
-    
+
     Class also supports custom scaling functions:
         ```python
             clr_fn = lambda x: 0.5*(1+np.sin(x*np.pi/2.))
@@ -44,14 +44,14 @@ class CyclicLR(tf.keras.callbacks.Callback):
                                 step_size=2000., scale_fn=clr_fn,
                                 scale_mode='cycle')
             model.fit(X_train, Y_train, callbacks=[clr])
-        ```    
+        ```
     # Arguments
         base_lr: initial learning rate which is the
             lower boundary in the cycle.
         max_lr: upper boundary in the cycle. Functionally,
             it defines the cycle amplitude (max_lr - base_lr).
             The lr at any cycle is the sum of base_lr
-            and some scaling of the amplitude; therefore 
+            and some scaling of the amplitude; therefore
             max_lr may not actually be reached depending on
             scaling function.
         step_size: number of training iterations per
@@ -64,11 +64,11 @@ class CyclicLR(tf.keras.callbacks.Callback):
         gamma: constant in 'exp_range' scaling function:
             gamma**(cycle iterations)
         scale_fn: Custom scaling policy defined by a single
-            argument lambda function, where 
+            argument lambda function, where
             0 <= scale_fn(x) <= 1 for all x >= 0.
-            mode paramater is ignored 
+            mode paramater is ignored
         scale_mode: {'cycle', 'iterations'}.
-            Defines whether scale_fn is evaluated on 
+            Defines whether scale_fn is evaluated on
             cycle number or cycle iterations (training
             iterations since start of cycle). Default is 'cycle'.
     """
@@ -113,7 +113,7 @@ class CyclicLR(tf.keras.callbacks.Callback):
         if new_step_size != None:
             self.step_size = new_step_size
         self.clr_iterations = 0.
-        
+
     def clr(self):
         cycle = np.floor(1+self.clr_iterations/(2*self.step_size))
         x = np.abs(self.clr_iterations/self.step_size - 2*cycle + 1)
@@ -121,17 +121,17 @@ class CyclicLR(tf.keras.callbacks.Callback):
             return self.base_lr + (self.max_lr-self.base_lr)*np.maximum(0, (1-x))*self.scale_fn(cycle)
         else:
             return self.base_lr + (self.max_lr-self.base_lr)*np.maximum(0, (1-x))*self.scale_fn(self.clr_iterations)
-        
+
     def on_train_begin(self, logs={}):
         logs = logs or {}
 
         if self.clr_iterations == 0:
             K.set_value(self.model.optimizer.lr, self.base_lr)
         else:
-            K.set_value(self.model.optimizer.lr, self.clr())        
-            
+            K.set_value(self.model.optimizer.lr, self.clr())
+
     def on_batch_end(self, epoch, logs=None):
-        
+
         logs = logs or {}
         self.trn_iterations += 1
         self.clr_iterations += 1
@@ -141,7 +141,7 @@ class CyclicLR(tf.keras.callbacks.Callback):
 
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
-        
+
         K.set_value(self.model.optimizer.lr, self.clr())
     def on_epoch_end(self, epoch, logs=None):
         print(self.clr())
@@ -171,7 +171,7 @@ def lr_schedule(epoch, base_learning_rate):
 def setUpModel(iteration_learning_rate):
 
     tf.keras.backend.clear_session()
-	
+
     # tf.keras.backend.clear_session()
     model = tf.keras.Sequential()
 
@@ -210,7 +210,7 @@ def setUpModel(iteration_learning_rate):
     # One 1 x 1 conv. 10 ReLU
     model.add(tf.keras.layers.Conv2D(filters =10, kernel_size =1, padding = "same", activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(l=l2_reg)))
     model.add(tf.keras.layers.BatchNormalization())
-    
+
     # global averaging over 6 ? 6 spatial dimensions
     model.add(tf.keras.layers.GlobalAveragePooling2D(data_format='channels_last', input_shape=(6, 6, 10)))
     # Full connected layer
@@ -239,7 +239,7 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
 # for herman PC:
     elif environment == "hermanPC":
         checkpoint_path = "../WeightsFromTraining/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".ckpt"
-        check_directory_exists(checkpoint_path) 
+        check_directory_exists(checkpoint_path)
     else:
         checkpoint_path = "./weights"+ ".ckpt"
 
@@ -247,41 +247,41 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
                                                      save_weights_only=True,
                                                      verbose=1)
     clr = CyclicLR(base_lr=0.01, max_lr=0.06, step_size=7815, mode='triangular2')
-													 
+
 # for google cloud:
     if environment == "googleCloud":
         model_checkpoint_path = "./model"+ ".h5"
 # for herman PC:
     elif environment == "hermanPC":
         model_checkpoint_path = "../Models/"+folder_name+"/modelCheckpoint_learning_rate" + str(iteration_learning_rate) + ".h5"
-        check_directory_exists(checkpoint_path) 
+        check_directory_exists(checkpoint_path)
     else:
         model_checkpoint_path = "./model"+ ".h5"
 
     cp_callback_model = tf.keras.callbacks.ModelCheckpoint(model_checkpoint_path, monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation 
-		featurewise_center=False,
-		featurewise_std_normalization=False,
-		rotation_range=20,
-		width_shift_range=0.2,
-		height_shift_range=0.2,
-		horizontal_flip=True)
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator( ##this is the start of the data augmentation
+                featurewise_center=False,
+                featurewise_std_normalization=False,
+                rotation_range=20,
+                width_shift_range=0.2,
+                height_shift_range=0.2,
+                horizontal_flip=True)
 
-    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size = 32), epochs=number_of_epochs, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback, cp_callback_model]) 
+    result = model.fit_generator(datagen.flow(x_train, y_train, batch_size = 32), epochs=number_of_epochs, validation_data = (x_test, y_test), callbacks = [tf.keras.callbacks.LearningRateScheduler(lambda epoch : lr_schedule(epoch, iteration_learning_rate)), cp_callback, cp_callback_model])
 
    # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32),
    #             epochs=350, validation_data = (x_test,y_test), callbacks = [clr, cp_callback,cp_callback_model])
 
-    # result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 32, validation_data = (x_test, y_test), callbacks = [cp_callback,cp_callback_model]) 
-	
-	# result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
+    # result = model.fit(x_train, y_train, epochs=number_of_epochs, batch_size = 32, validation_data = (x_test, y_test), callbacks = [cp_callback,cp_callback_model])
+
+        # result = model.fit_generator(datagen.flow(x_train, y_train, batch_size=100),
     #             epochs=350, validation_data = (x_test,y_test), callbacks = [LearningRateScheduler(lr_schedule), cp_callback])
 
      # prints the result to csv file
 
 
-# for google cloud: 
+# for google cloud:
     if environment == "googleCloud":
         full_path = "./X"+ ".csv"
 #for herman PC:
@@ -313,18 +313,18 @@ def trainModel(model, iteration_learning_rate, number_of_epochs, folder_name, en
 def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epochs = 5, environment = "googleCloud"):
     print("starting with learning rate " + str(iteration_learning_rate))
     model = setUpModel(iteration_learning_rate)
-    
+
     trainModel(model, iteration_learning_rate, epochs, folder_name, environment)
     full_path = ""
 
 # for google cloud:
     if environment == "googleCloud":
         full_path ="./model"+".h5"
-        
+
 # for herman PC:
     elif environment == "hermanPC":
         full_path ="../Models/"+folder_name+"/learning_rate" + str(iteration_learning_rate) + ".h5"
-        check_directory_exists(full_path) 
+        check_directory_exists(full_path)
     else:
         full_path == "./model.h5"
 
@@ -333,12 +333,9 @@ def initializeTraining(iteration_learning_rate = 0.01, folder_name = "foo", epoc
 
 
 
-initializeTraining(0.01,"foo", 100, "googleCloud")
+initializeTraining(0.01,"foo", 200, "googleCloud")
 
 # for loading the model see:
 # loading_checkpoint_path = "../Models/all-cnn-c-dataaugment90noclr/learning_rate0.01.h5"
 # model = tf.keras.models.load_model(loading_checkpoint_path)
 # model.evaluate(x_test, y_test)
-
-
-
